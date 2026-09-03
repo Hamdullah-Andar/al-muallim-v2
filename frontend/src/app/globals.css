@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/* 
+  1. BASE THEME VARIABLES
+  We define our core light mode colors here. 
+  `--background` is the main page color, and `--foreground` is the text color.
+*/
+:root {
+  --background: #f8fafc; /* A very light, soft gray/blue for a clean look */
+  --foreground: #0f172a; /* A dark slate color for readable text */
+}
+
+/* 
+  2. DARK MODE OVERRIDES
+  If the user's device is set to Dark Mode, these variables take over.
+*/
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #001a14; /* A very deep, almost black green for a premium Islamic app feel */
+    --foreground: #f8fafc; /* White/light gray text for contrast against the dark background */
+  }
+}
+
+/* 
+  3. TAILWIND V4 THEME CONFIGURATION
+  In Tailwind v4, we use `@theme inline` directly in the CSS file to define our custom colors, 
+  instead of using a tailwind.config.ts file.
+*/
+@theme inline {
+  /* We define a custom color palette called "primary". 
+     These are variations of the Deep Green color from your design mockup.
+     Now we can use classes like `bg-primary-500` or `text-primary-900` anywhere in the app! */
+  --color-primary-50: #e0f2f1;
+  --color-primary-100: #b2dfdb;
+  --color-primary-200: #80cbc4;
+  --color-primary-300: #4db6ac;
+  --color-primary-400: #26a69a;
+  --color-primary-500: #009688;
+  --color-primary-600: #00897b;
+  --color-primary-700: #00796b;
+  --color-primary-800: #00695c;
+  --color-primary-900: #004d40; /* The signature Deep Green */
+
+  /* Tell Tailwind to use our CSS variables for the default background and foreground */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  /* Link Tailwind's default sans-serif font to our custom Google Font (Outfit) */
+  --font-sans: var(--font-outfit), sans-serif;
+}
+
+/* 
+  4. BASE HTML ELEMENTS
+  Apply our background, text color, and custom font to the entire body of the app.
+*/
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* 
+  5. CUSTOM UTILITY CLASSES
+  We use `@layer utilities` to create reusable custom classes.
+  "Glassmorphism" is a UI trend that looks like frosted glass. We will use this for our assignment cards!
+*/
+@layer utilities {
+  .glass {
+    /* bg-white/70 means white background with 70% opacity. backdrop-blur makes what's behind it blurry. */
+    @apply bg-white/70 dark:bg-black/40 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg;
+  }
+  .glass-card {
+    /* We build upon our .glass class, making it rounded, padded, and giving it a hover animation (moves up slightly) */
+    @apply bg-white/70 dark:bg-black/40 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+}

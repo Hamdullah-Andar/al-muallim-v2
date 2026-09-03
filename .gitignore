@@ -1,0 +1,19 @@
+# Dependencies (ignore node_modules at any depth)
+**/node_modules/
+
+# Next.js build output
+**/.next/
+
+# Environment files containing secrets / passwords
+**/.env
+**/.env.*
+*.env
+
+# Build outputs
+**/dist/
+**/build/
+*.tsbuildinfo
+
+# OS temp files
+.DS_Store
+Thumbs.db
