@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { connectDB } from './config/database';
 
 // 1. Load environment variables from a .env file (if one exists)
 dotenv.config();
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // 5. Start listening for incoming connections
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await connectDB();
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });

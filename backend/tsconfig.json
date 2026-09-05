@@ -1,44 +1,27 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
+    // 1. Target JavaScript Version: Output modern, clean ES2022 JavaScript
+    "target": "ES2022",
 
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
-    "types": [],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
+    // 2. Module System: Use standard CommonJS (standard for Node.js / Express backends)
+    "module": "CommonJS",
 
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    // 3. Module Resolution: How TypeScript locates files in 'node_modules' (Node-style resolution)
+    "moduleResolution": "node",
 
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    // 4. Interoperability: Allows you to use clean 'import express from "express"' 
+    //    even if the library was originally written in CommonJS
+    "esModuleInterop": true,
 
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
+    // 5. Case Sensitivity: Ensures file imports match disk casing (prevents Windows vs Linux bugs)
+    "forceConsistentCasingInFileNames": true,
 
-    // Recommended Options
+    // 6. Strict Type Checking: Enables all strict type-checking options for safer code
     "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
+
+    // 7. Skip Library Checking: Don't waste time type-checking inside node_modules (.d.ts files)
+    "skipLibCheck": true
+  },
+  // Only compile and check files inside our 'src' directory
+  "include": ["src/**/*"]
 }
