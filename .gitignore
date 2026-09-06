@@ -1,19 +1,24 @@
-# Dependencies (ignore node_modules at any depth)
-**/node_modules/
+# ==========================================
+# 1. FRONTEND (Next.js)
+# ==========================================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env*
+frontend/next-env.d.ts
 
-# Next.js build output
-**/.next/
+# ==========================================
+# 2. BACKEND (Node.js / Express)
+# ==========================================
+backend/node_modules/
+backend/dist/
+backend/build/
+backend/.env*
+backend/*.tsbuildinfo
 
-# Environment files containing secrets / passwords
-**/.env
-**/.env.*
-*.env
-
-# Build outputs
-**/dist/
-**/build/
-*.tsbuildinfo
-
-# OS temp files
+# ==========================================
+# 3. GENERAL & OS
+# ==========================================
+*.log
 .DS_Store
 Thumbs.db
