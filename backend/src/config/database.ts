@@ -11,7 +11,7 @@ export const sequelize = new Sequelize(
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT) || 5432,
     dialect: 'postgres',
-    logging: false, // Set to console.log to see SQL queries in console
+    logging: false,
     pool: {
       max: 5,
       min: 0,
@@ -25,6 +25,10 @@ export const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ PostgreSQL connected successfully via Sequelize!');
+
+    // Automatically sync models to database tables
+    await sequelize.sync({ alter: true });
+    console.log('📦 Database tables synchronized successfully!');
   } catch (error) {
     console.error('❌ Unable to connect to PostgreSQL database:', error);
   }
