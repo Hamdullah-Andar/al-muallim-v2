@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/database';
 import './models/User'
+import authRoutes from './routes/authRoutes'; // 👈 1. Import auth routes
 
 // 1. Load environment variables from a .env file (if one exists)
 dotenv.config();
@@ -24,6 +25,8 @@ app.get('/api/health', (req, res) => {
     message: 'Al-Muallim V2 Express API is running smoothly!'
   });
 });
+
+app.use('/api/auth', authRoutes); // 👈 2. Connect routes to /api/auth
 
 // 5. Start listening for incoming connections
 app.listen(PORT, async () => {
