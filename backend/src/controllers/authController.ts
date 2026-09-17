@@ -71,3 +71,54 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: 'Internal server error during registration' });
   }
 };
+
+
+// @desc    Authenticate user & get token (Login)
+// @route   POST /api/auth/login
+// @access  Public
+export const login = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, password } = req.body;
+
+    // 1. Validation: Ensure both fields are provided
+    if (!email || !password) {
+      res.status(400).json({ error: 'Please provide both email and password' });
+      return;
+    }
+
+    // 2. Find user by email
+    const user = await User.findOne({ where: { email: email.toLowerCase() } });
+
+    // 3. Check if user exists AND password matches
+    // Note: We use a generic error message so hackers cannot guess which emails exist!
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      res.status(401).json({ error: 'Invalid email or password' });
+      return;
+    }
+
+    // 4. Check if the account is active
+    if (!user.isActive) {
+      res.status(403).json({ error: 'Your account has been deactivated. Please contact an admin.' });
+      return;
+    }
+
+    // 5. Generate fresh JWT token
+    const token = generateToken(user.id, user.role);
+
+    // 6. Return response with user data (excluding password)
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    console.error('Login Error:', error);
+    res.status(500).json({ error: 'Internal server error during login' });
+  }
+};

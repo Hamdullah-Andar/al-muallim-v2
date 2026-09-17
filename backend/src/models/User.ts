@@ -24,18 +24,18 @@ export class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes
 {
-  public id!: string;
-  public name!: string;
-  public email!: string;
-  public password!: string;
-  public role!: 'student' | 'teacher' | 'admin' | 'parent';
-  public avatar!: string | null;
-  public phone!: string | null;
-  public isActive!: boolean;
+  declare id: string;
+  declare name: string;
+  declare email: string;
+  declare password: string;
+  declare role: 'student' | 'teacher' | 'admin' | 'parent';
+  declare avatar: string | null;
+  declare phone: string | null;
+  declare isActive: boolean;
 
   // Timestamps
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
 }
 
 // 4. Initialize the model with PostgreSQL table schema
