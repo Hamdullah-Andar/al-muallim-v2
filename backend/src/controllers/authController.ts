@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
+import { AuthRequest } from '../middleware/authMiddleware';
 
 // Helper function: Generate a signed JWT token
 export const generateToken = (userId: string, role: string): string => {
@@ -120,5 +121,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     console.error('Login Error:', error);
     res.status(500).json({ error: 'Internal server error during login' });
+  }
+};
+
+
+// @desc    Get currently logged-in user profile
+// @route   GET /api/auth/me
+// @access  Private (Protected by token)
+export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    // req.user was already verified and attached by the protect middleware!
+    res.status(200).json({
+      success: true,
+      user: req.user,
+    });
+  } catch (error) {
+    console.error('GetMe Error:', error);
+    res.status(500).json({ error: 'Server error retrieving user profile' });
   }
 };

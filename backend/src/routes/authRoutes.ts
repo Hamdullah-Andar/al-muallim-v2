@@ -1,12 +1,14 @@
 import { Router } from 'express';
-import { login, register } from '../controllers/authController';
+import { getMe, login, register } from '../controllers/authController';
+import { protect } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// Public registration route
+// Public routes
 router.post('/register', register);
-
-// Public login route
 router.post('/login', login);
+
+// Protected routes (Notice 'protect' sits before 'getMe'!)
+router.get('/me', protect as any, getMe as any);
 
 export default router;
