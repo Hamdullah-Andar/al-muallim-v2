@@ -60,3 +60,19 @@ export const protect = async (
     return;
   }
 };
+
+// 3. Role-Based Authorization Middleware (Factory function)
+export const authorize = (...roles: string[]) => {
+  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+    // Ensure req.user was already populated by protect()
+    if (!req.user || !roles.includes(req.user.role)) {
+      res.status(403).json({
+        error: `User role '${req.user?.role}' is not authorized to access this route`,
+      });
+      return;
+    }
+
+    // Role matches! Pass to the next function
+    next();
+  };
+};
