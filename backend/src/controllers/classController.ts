@@ -6,17 +6,36 @@ import { Class, Section, User } from '../models';
 // @access  Private (Admin only)
 export const createClass = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, gradeLevel, description, classTeacherId } = req.body;
+    const { name, gradeLevel, description, classTeacherId, academicYear, capacity } = req.body;
 
     if (!name) {
       res.status(400).json({ error: 'Class name is required' });
       return;
     }
 
-    // Optional: If classTeacherId provided, verify that the teacher exists and has 'teacher' role
+    // 1. Prevent duplicate class in the same academic year
+    const existingClass = await Class.findOne({
+      where: {
+        name,
+        academicYear: academicYear || null,
+      },
+    });
+
+    if (existingClass) {
+      res.status(409).json({
+        error: `A class named '${name}' already exists for academic year '${academicYear || 'current'}'`,
+      });
+      return;
+    }
+
+    // 2. If a classTeacherId is provided, verify they exist and have 'teacher' role
     if (classTeacherId) {
       const teacher = await User.findByPk(classTeacherId);
-      if (!teacher || (teacher.role !== 'teacher' && teacher.role !== 'admin')) {
+      if (!teacher) {
+        res.status(404).json({ error: 'Assigned teacher not found' });
+        return;
+      }
+      if (teacher.role !== 'teacher' && teacher.role !== 'admin') {
         res.status(400).json({ error: 'Assigned user must be a teacher or admin' });
         return;
       }
@@ -24,9 +43,10 @@ export const createClass = async (req: Request, res: Response): Promise<void> =>
 
     const newClass = await Class.create({
       name,
-      gradeLevel: gradeLevel ? Number(gradeLevel) : null,
+      gradeLevel: gradeLevel || null,
       description: description || null,
       classTeacherId: classTeacherId || null,
+      academicYear: academicYear || '2026-2027',
       isActive: true,
     });
 
@@ -35,9 +55,11 @@ export const createClass = async (req: Request, res: Response): Promise<void> =>
       message: 'Class created successfully',
       data: newClass,
     });
-  } catch (error) {
-    console.error('Create Class Error:', error);
-    res.status(500).json({ error: 'Server error creating class' });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Failed to create class',
+      details: error.message,
+    });
   }
 };
 
@@ -47,13 +69,12 @@ export const createClass = async (req: Request, res: Response): Promise<void> =>
 export const getClasses = async (req: Request, res: Response): Promise<void> => {
   try {
     const classes = await Class.findAll({
-      where: { isActive: true },
       include: [
         {
           model: Section,
           as: 'sections',
           where: { isActive: true },
-          required: false, // Left outer join: include classes even if they have no sections yet!
+          required: false,
         },
         {
           model: User,
@@ -61,10 +82,7 @@ export const getClasses = async (req: Request, res: Response): Promise<void> => 
           attributes: ['id', 'name', 'email', 'avatar'],
         },
       ],
-      order: [
-        ['gradeLevel', 'ASC'],
-        ['name', 'ASC'],
-      ],
+      order: [['createdAt', 'DESC']],
     });
 
     res.status(200).json({
@@ -72,9 +90,11 @@ export const getClasses = async (req: Request, res: Response): Promise<void> => 
       count: classes.length,
       data: classes,
     });
-  } catch (error) {
-    console.error('Get Classes Error:', error);
-    res.status(500).json({ error: 'Server error retrieving classes' });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Failed to fetch classes',
+      details: error.message,
+    });
   }
 };
 
@@ -115,9 +135,11 @@ export const getClassById = async (req: Request, res: Response): Promise<void> =
       success: true,
       data: foundClass,
     });
-  } catch (error) {
-    console.error('Get Class By ID Error:', error);
-    res.status(500).json({ error: 'Server error retrieving class' });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Failed to fetch class',
+      details: error.message,
+    });
   }
 };
 
@@ -129,7 +151,6 @@ export const createSection = async (req: Request, res: Response): Promise<void> 
     const { classId } = req.params;
     const { name, roomNumber, capacity } = req.body;
 
-    // 1. Guard check: guarantees classId is strictly a string (not undefined or string[])
     if (typeof classId !== 'string') {
       res.status(400).json({ error: 'Class ID parameter is required' });
       return;
@@ -140,10 +161,25 @@ export const createSection = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // 2. Verify parent class exists
+    // 1. Verify parent class exists
     const parentClass = await Class.findByPk(classId);
     if (!parentClass) {
       res.status(404).json({ error: 'Parent class not found' });
+      return;
+    }
+
+    // 2. Prevent duplicate section name in the same class
+    const existingSection = await Section.findOne({
+      where: {
+        name,
+        classId,
+      },
+    });
+
+    if (existingSection) {
+      res.status(409).json({
+        error: `Section '${name}' already exists in this class`,
+      });
       return;
     }
 
@@ -168,4 +204,3 @@ export const createSection = async (req: Request, res: Response): Promise<void> 
     });
   }
 };
-

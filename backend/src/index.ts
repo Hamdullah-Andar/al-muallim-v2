@@ -5,6 +5,7 @@ import { connectDB } from './config/database';
 import './models'
 import authRoutes from './routes/authRoutes'; // 👈 1. Import auth routes
 import classRoutes from './routes/classRoutes';
+import enrollmentRoutes from './routes/enrollmentRoutes';
 
 // 1. Load environment variables from a .env file (if one exists)
 dotenv.config();
@@ -30,6 +31,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes); // 👈 2. Connect routes to /api/auth
 
 app.use('/api/classes', classRoutes);
+
+app.use('/api/enrollments', enrollmentRoutes);
+
 
 // 5. Start listening for incoming connections
 app.listen(PORT, async () => {

@@ -1,12 +1,23 @@
 import { User } from './User';
 import { Class } from './Class';
 import { Section } from './Section';
+import Enrollment from './Enrollment';
 
 // ==========================================
-// Define Relationships (Associations)
+// 1. User (Teacher) <-> Class Relationships
 // ==========================================
+User.hasMany(Class, {
+  foreignKey: 'classTeacherId',
+  as: 'managedClasses',
+});
+Class.belongsTo(User, {
+  foreignKey: 'classTeacherId',
+  as: 'teacher',
+});
 
-// 1. Class <-> Section (One Class has Many Sections)
+// ==========================================
+// 2. Class <-> Section Relationships
+// ==========================================
 Class.hasMany(Section, {
   foreignKey: 'classId',
   as: 'sections',
@@ -17,15 +28,59 @@ Section.belongsTo(Class, {
   as: 'class',
 });
 
-// 2. Class <-> User (Class has an assigned Teacher)
-Class.belongsTo(User, {
-  foreignKey: 'classTeacherId',
-  as: 'teacher',
+// ==========================================
+// 3. User (Student) <-> Enrollment Relationships
+// ==========================================
+User.hasMany(Enrollment, {
+  foreignKey: 'studentId',
+  as: 'enrollments',
+  onDelete: 'CASCADE',
 });
-User.hasMany(Class, {
-  foreignKey: 'classTeacherId',
-  as: 'taughtClasses',
+Enrollment.belongsTo(User, {
+  foreignKey: 'studentId',
+  as: 'student',
 });
 
-// Export all models together
-export { User, Class, Section };
+// ==========================================
+// 4. Class <-> Enrollment Relationships
+// ==========================================
+Class.hasMany(Enrollment, {
+  foreignKey: 'classId',
+  as: 'enrollments',
+  onDelete: 'CASCADE',
+});
+Enrollment.belongsTo(Class, {
+  foreignKey: 'classId',
+  as: 'class',
+});
+
+// ==========================================
+// 5. Section <-> Enrollment Relationships
+// ==========================================
+Section.hasMany(Enrollment, {
+  foreignKey: 'sectionId',
+  as: 'enrollments',
+  onDelete: 'SET NULL',
+});
+Enrollment.belongsTo(Section, {
+  foreignKey: 'sectionId',
+  as: 'section',
+});
+
+// ==========================================
+// 6. Many-to-Many: Student <-> Class (through Enrollment)
+// ==========================================
+User.belongsToMany(Class, {
+  through: Enrollment,
+  foreignKey: 'studentId',
+  otherKey: 'classId',
+  as: 'enrolledClasses',
+});
+Class.belongsToMany(User, {
+  through: Enrollment,
+  foreignKey: 'classId',
+  otherKey: 'studentId',
+  as: 'students',
+});
+
+export { User, Class, Section, Enrollment };

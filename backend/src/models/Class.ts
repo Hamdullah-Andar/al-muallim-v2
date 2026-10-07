@@ -5,6 +5,7 @@ export interface ClassAttributes {
   id: string;
   name: string;
   gradeLevel?: number | null;
+  academicYear?: string;
   description?: string | null;
   classTeacherId?: string | null;
   isActive: boolean;
@@ -13,7 +14,10 @@ export interface ClassAttributes {
 }
 
 export interface ClassCreationAttributes
-  extends Optional<ClassAttributes, 'id' | 'gradeLevel' | 'description' | 'classTeacherId' | 'isActive'> {}
+  extends Optional<
+    ClassAttributes,
+    'id' | 'gradeLevel' | 'academicYear' | 'description' | 'classTeacherId' | 'isActive'
+  > {}
 
 export class Class
   extends Model<ClassAttributes, ClassCreationAttributes>
@@ -22,6 +26,7 @@ export class Class
   declare id: string;
   declare name: string;
   declare gradeLevel: number | null;
+  declare academicYear: string;
   declare description: string | null;
   declare classTeacherId: string | null;
   declare isActive: boolean;
@@ -38,7 +43,7 @@ Class.init(
       primaryKey: true,
     },
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
       allowNull: false,
       validate: {
         notEmpty: true,
@@ -47,6 +52,11 @@ Class.init(
     gradeLevel: {
       type: DataTypes.INTEGER,
       allowNull: true,
+    },
+    academicYear: {
+      type: DataTypes.STRING(20),
+      defaultValue: '2026-2027',
+      allowNull: false,
     },
     description: {
       type: DataTypes.TEXT,
@@ -59,16 +69,26 @@ Class.init(
         model: 'users',
         key: 'id',
       },
+      onDelete: 'SET NULL',
     },
     isActive: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
       defaultValue: true,
+      allowNull: false,
     },
   },
   {
     sequelize,
     tableName: 'classes',
     timestamps: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ['name', 'academicYear'],
+        name: 'unique_class_per_academic_year',
+      },
+    ],
   }
 );
+
+export default Class;
