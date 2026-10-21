@@ -1,3 +1,4 @@
+import { sequelize } from '../config/database';
 import { User } from './User';
 import { Class } from './Class';
 import { Section } from './Section';
@@ -5,6 +6,7 @@ import Enrollment from './Enrollment';
 import Subject from './Subject';
 import Module from './Module';
 import Lesson from './Lesson';
+import Attendance from './Attendance';
 
 // ==========================================
 // 1. User (Teacher) <-> Class Relationships
@@ -138,8 +140,56 @@ Lesson.belongsTo(Module, {
   as: 'module',
 });
 
-// Export all models together
+// ==========================================
+// 11. Attendance Relationships
+// ==========================================
+// Student <-> Attendance
+User.hasMany(Attendance, {
+  foreignKey: 'studentId',
+  as: 'attendances',
+  onDelete: 'CASCADE',
+});
+Attendance.belongsTo(User, {
+  foreignKey: 'studentId',
+  as: 'student',
+});
+
+// Class <-> Attendance
+Class.hasMany(Attendance, {
+  foreignKey: 'classId',
+  as: 'attendances',
+  onDelete: 'CASCADE',
+});
+Attendance.belongsTo(Class, {
+  foreignKey: 'classId',
+  as: 'class',
+});
+
+// Section <-> Attendance
+Section.hasMany(Attendance, {
+  foreignKey: 'sectionId',
+  as: 'attendances',
+  onDelete: 'SET NULL',
+});
+Attendance.belongsTo(Section, {
+  foreignKey: 'sectionId',
+  as: 'section',
+});
+
+// Teacher / Admin who recorded the attendance
+User.hasMany(Attendance, {
+  foreignKey: 'recordedBy',
+  as: 'recordedAttendances',
+  onDelete: 'RESTRICT',
+});
+Attendance.belongsTo(User, {
+  foreignKey: 'recordedBy',
+  as: 'recorder',
+});
+
+// Export all models together + sequelize
 export {
+  sequelize,
   User,
   Class,
   Section,
@@ -147,4 +197,5 @@ export {
   Subject,
   Module,
   Lesson,
+  Attendance,
 };
