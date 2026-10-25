@@ -7,6 +7,8 @@ import Subject from './Subject';
 import Module from './Module';
 import Lesson from './Lesson';
 import Attendance from './Attendance';
+import Submission from './Submission';
+import Assignment from './Assignment';
 
 // ==========================================
 // 1. User (Teacher) <-> Class Relationships
@@ -187,6 +189,78 @@ Attendance.belongsTo(User, {
   as: 'recorder',
 });
 
+// ==========================================
+// 12. Assignment Relationships
+// ==========================================
+// Class <-> Assignment
+Class.hasMany(Assignment, {
+  foreignKey: 'classId',
+  as: 'assignments',
+  onDelete: 'CASCADE',
+});
+Assignment.belongsTo(Class, {
+  foreignKey: 'classId',
+  as: 'class',
+});
+
+// Subject <-> Assignment (Optional relation)
+Subject.hasMany(Assignment, {
+  foreignKey: 'subjectId',
+  as: 'assignments',
+  onDelete: 'SET NULL',
+});
+Assignment.belongsTo(Subject, {
+  foreignKey: 'subjectId',
+  as: 'subject',
+});
+
+// User (Teacher/Creator) <-> Assignment
+User.hasMany(Assignment, {
+  foreignKey: 'creatorId',
+  as: 'createdAssignments',
+  onDelete: 'RESTRICT',
+});
+Assignment.belongsTo(User, {
+  foreignKey: 'creatorId',
+  as: 'creator',
+});
+
+// ==========================================
+// 13. Submission Relationships
+// ==========================================
+// Assignment <-> Submission
+Assignment.hasMany(Submission, {
+  foreignKey: 'assignmentId',
+  as: 'submissions',
+  onDelete: 'CASCADE',
+});
+Submission.belongsTo(Assignment, {
+  foreignKey: 'assignmentId',
+  as: 'assignment',
+});
+
+// Student <-> Submission
+User.hasMany(Submission, {
+  foreignKey: 'studentId',
+  as: 'submissions',
+  onDelete: 'CASCADE',
+});
+Submission.belongsTo(User, {
+  foreignKey: 'studentId',
+  as: 'student',
+});
+
+// Teacher (Grader) <-> Submission
+User.hasMany(Submission, {
+  foreignKey: 'gradedBy',
+  as: 'gradedSubmissions',
+  onDelete: 'SET NULL',
+});
+Submission.belongsTo(User, {
+  foreignKey: 'gradedBy',
+  as: 'grader',
+});
+
 // Export all models together + sequelize
 export {
   sequelize,
@@ -198,4 +272,6 @@ export {
   Module,
   Lesson,
   Attendance,
+  Assignment,
+  Submission,
 };
