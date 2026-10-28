@@ -9,6 +9,7 @@ import enrollmentRoutes from './routes/enrollmentRoutes';
 import curriculumRoutes from './routes/curriculumRoutes';
 import attendanceRoutes from './routes/attendanceRoutes';
 import assignmentRoutes from './routes/assignmentRoutes';
+import quizRoutes from './routes/quizRoutes';
 
 // 1. Load environment variables from a .env file (if one exists)
 dotenv.config();
@@ -43,6 +44,7 @@ app.use('/api/attendance', attendanceRoutes);
 
 app.use('/api/assignments', assignmentRoutes);
 
+app.use('/api/quizzes', quizRoutes);
 
 // 5. Start listening for incoming connections
 app.listen(PORT, async () => {

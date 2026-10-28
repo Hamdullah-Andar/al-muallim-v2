@@ -9,6 +9,10 @@ import Lesson from './Lesson';
 import Attendance from './Attendance';
 import Submission from './Submission';
 import Assignment from './Assignment';
+import Quiz from './Quiz';
+import Question from './Question';
+import QuizAttempt from './QuizAttempt';
+import Option from './Option';
 
 // ==========================================
 // 1. User (Teacher) <-> Class Relationships
@@ -261,6 +265,93 @@ Submission.belongsTo(User, {
   as: 'grader',
 });
 
+// ==========================================
+// 14. Quiz Relationships
+// ==========================================
+// Class <-> Quiz
+Class.hasMany(Quiz, {
+  foreignKey: 'classId',
+  as: 'quizzes',
+  onDelete: 'CASCADE',
+});
+Quiz.belongsTo(Class, {
+  foreignKey: 'classId',
+  as: 'class',
+});
+
+// Subject <-> Quiz (Optional)
+Subject.hasMany(Quiz, {
+  foreignKey: 'subjectId',
+  as: 'quizzes',
+  onDelete: 'SET NULL',
+});
+Quiz.belongsTo(Subject, {
+  foreignKey: 'subjectId',
+  as: 'subject',
+});
+
+// User (Teacher/Creator) <-> Quiz
+User.hasMany(Quiz, {
+  foreignKey: 'creatorId',
+  as: 'createdQuizzes',
+  onDelete: 'RESTRICT',
+});
+Quiz.belongsTo(User, {
+  foreignKey: 'creatorId',
+  as: 'creator',
+});
+
+// ==========================================
+// 15. Question & Option Relationships
+// ==========================================
+// Quiz <-> Question
+Quiz.hasMany(Question, {
+  foreignKey: 'quizId',
+  as: 'questions',
+  onDelete: 'CASCADE',
+});
+Question.belongsTo(Quiz, {
+  foreignKey: 'quizId',
+  as: 'quiz',
+});
+
+// Question <-> Option
+Question.hasMany(Option, {
+  foreignKey: 'questionId',
+  as: 'options',
+  onDelete: 'CASCADE',
+});
+Option.belongsTo(Question, {
+  foreignKey: 'questionId',
+  as: 'question',
+});
+
+// ==========================================
+// 16. QuizAttempt Relationships
+// ==========================================
+// Quiz <-> QuizAttempt
+Quiz.hasMany(QuizAttempt, {
+  foreignKey: 'quizId',
+  as: 'attempts',
+  onDelete: 'CASCADE',
+});
+QuizAttempt.belongsTo(Quiz, {
+  foreignKey: 'quizId',
+  as: 'quiz',
+});
+
+// Student (User) <-> QuizAttempt
+User.hasMany(QuizAttempt, {
+  foreignKey: 'studentId',
+  as: 'quizAttempts',
+  onDelete: 'CASCADE',
+});
+QuizAttempt.belongsTo(User, {
+  foreignKey: 'studentId',
+  as: 'student',
+});
+
+
 // Export all models together + sequelize
 export {
   sequelize,
@@ -274,4 +365,8 @@ export {
   Attendance,
   Assignment,
   Submission,
+  Quiz,
+  Question,
+  Option,
+  QuizAttempt,
 };
