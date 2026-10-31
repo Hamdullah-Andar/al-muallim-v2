@@ -13,6 +13,9 @@ import Quiz from './Quiz';
 import Question from './Question';
 import QuizAttempt from './QuizAttempt';
 import Option from './Option';
+import DiscussionThread from './DiscussionThread';
+import DiscussionReply from './DiscussionReply';
+import Notification from './Notification';
 
 // ==========================================
 // 1. User (Teacher) <-> Class Relationships
@@ -351,6 +354,102 @@ QuizAttempt.belongsTo(User, {
   as: 'student',
 });
 
+// ==========================================
+// 17. DiscussionThread Relationships
+// ==========================================
+// User (Author) <-> DiscussionThread
+User.hasMany(DiscussionThread, {
+  foreignKey: 'authorId',
+  as: 'discussionThreads',
+  onDelete: 'CASCADE',
+});
+DiscussionThread.belongsTo(User, {
+  foreignKey: 'authorId',
+  as: 'author',
+});
+
+// Class <-> DiscussionThread
+Class.hasMany(DiscussionThread, {
+  foreignKey: 'classId',
+  as: 'threads',
+  onDelete: 'CASCADE',
+});
+DiscussionThread.belongsTo(Class, {
+  foreignKey: 'classId',
+  as: 'class',
+});
+
+// Subject <-> DiscussionThread
+Subject.hasMany(DiscussionThread, {
+  foreignKey: 'subjectId',
+  as: 'threads',
+  onDelete: 'SET NULL',
+});
+DiscussionThread.belongsTo(Subject, {
+  foreignKey: 'subjectId',
+  as: 'subject',
+});
+
+// Lesson <-> DiscussionThread (e.g. Q&A under a specific Surah/Ayah lesson)
+Lesson.hasMany(DiscussionThread, {
+  foreignKey: 'lessonId',
+  as: 'threads',
+  onDelete: 'SET NULL',
+});
+DiscussionThread.belongsTo(Lesson, {
+  foreignKey: 'lessonId',
+  as: 'lesson',
+});
+
+// ==========================================
+// 18. DiscussionReply Relationships
+// ==========================================
+// DiscussionThread <-> DiscussionReply
+DiscussionThread.hasMany(DiscussionReply, {
+  foreignKey: 'threadId',
+  as: 'replies',
+  onDelete: 'CASCADE',
+});
+DiscussionReply.belongsTo(DiscussionThread, {
+  foreignKey: 'threadId',
+  as: 'thread',
+});
+
+// User (Author) <-> DiscussionReply
+User.hasMany(DiscussionReply, {
+  foreignKey: 'authorId',
+  as: 'discussionReplies',
+  onDelete: 'CASCADE',
+});
+DiscussionReply.belongsTo(User, {
+  foreignKey: 'authorId',
+  as: 'author',
+});
+
+// Self-referencing: DiscussionReply (parent) <-> DiscussionReply (child replies)
+DiscussionReply.hasMany(DiscussionReply, {
+  foreignKey: 'parentReplyId',
+  as: 'childReplies',
+  onDelete: 'CASCADE',
+});
+DiscussionReply.belongsTo(DiscussionReply, {
+  foreignKey: 'parentReplyId',
+  as: 'parentReply',
+});
+
+// ==========================================
+// 19. Notification Relationships
+// ==========================================
+// User <-> Notification
+User.hasMany(Notification, {
+  foreignKey: 'userId',
+  as: 'notifications',
+  onDelete: 'CASCADE',
+});
+Notification.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
 
 // Export all models together + sequelize
 export {
@@ -369,4 +468,7 @@ export {
   Question,
   Option,
   QuizAttempt,
+  DiscussionThread,
+  DiscussionReply,
+  Notification,
 };
